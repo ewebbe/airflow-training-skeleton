@@ -62,7 +62,7 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
     cluster_name='analyse-pricing-{{ ds }}',
     project_id=c.PROJECT_ID,
     num_workers=2,
-    zone='europe-west1',
+    zone='europe-west4-a',
     dag=dag2
 )
 
