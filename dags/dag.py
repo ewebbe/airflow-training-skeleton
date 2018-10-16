@@ -9,7 +9,7 @@ from airflow.contrib.operators.dataproc_operator import (
     DataprocClusterDeleteOperator,
     DataProcPySparkOperator
 )
-from airflow.contrib.operators.gsc_to_bq import GoogleCloudStorageToBigQueryOperator
+from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
 
 dag = DAG(
     dag_id="my_first_dag",
