@@ -11,8 +11,8 @@ dag = DAG(
         "owner": "airflow",
         "start_date": dt.datetime(2018, 8, 1),
         "depends_on_past": True,
-        "email_on_failure": True,
-        "email": "ewebbe@bol.com",
+        "email_on_failure": True
+        # "email": "ewebbe@bol.com",
     },
 )
 
@@ -32,10 +32,10 @@ pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
     task_id="CollectDataFromPgrs",
     postgres_conn_id='Training_postgres',
     sql="SELECT * \
-         FROM gdd.land_registry_price_paid_uk \
+         FROM land_registry_price_paid_uk \
          WHERE transfer_date = '{{ ds }}'",
     bucket='airflow_training_data_123',
-    filename='out.csv',
+    filename='PricePaid/{{ds}}/out.json',
     provide_context=True,
     dag=dag
 )
