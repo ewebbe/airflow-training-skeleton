@@ -59,7 +59,7 @@ pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
 
 dataproc_create_cluster = DataprocClusterCreateOperator(
     task_id='CreateTheCluster',
-    cluster_name='Guybrush',
+    cluster_name='analyse-pricing-{{ ds }}',
     project_id=c.PROJECT_ID,
     num_workers=2,
     zone='europe-west1',
@@ -69,15 +69,15 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
 compute_aggregates = DataProcPySparkOperator(
     task_id='ComputeAllTheThings',
     main='gs://gdd-trainings-bucket/build_statistics.py',
-    cluster_name='Guybrush',
+    cluster_name='analyse-pricing-{{ ds }}',
     arguments=["{{ ds }}"],
     dag=dag2
 )
 
 dataproc_delete_cluster = DataprocClusterDeleteOperator(
     task_id='KillTheCluster',
-    cluster_name='Guybrush',
+    cluster_name='analyse-pricing-{{ ds }}',
     project_id=c.PROJECT_ID,
-    trigger_rule='ALL_DONE',
+    trigger_rule=TriggerRule.ALL_DONE,
     dag=dag2
 )
