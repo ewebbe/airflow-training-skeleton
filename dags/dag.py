@@ -100,7 +100,7 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
 
 copy_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id='CopyDataToBigQuery',
-    bucket='gs://airflow_training_data_123',
+    bucket='airflow_training_data_123',
     source_objects='/average_prices/*',
     destination_project_dataset_table='Analysis.average_prices',
     source_format='PARQUET',
