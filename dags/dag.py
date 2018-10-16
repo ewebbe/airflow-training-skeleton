@@ -103,8 +103,8 @@ copy_to_bq = GoogleCloudStorageToBigQueryOperator(
     bucket='gs://airflow_training_data_123',
     source_objects='/average_prices/*',
     destination_project_dataset_table='Analysis.average_prices',
-    source_format=PARQUET,
-    write_disposition=WRITE_TRUNCATE,
+    source_format='PARQUET',
+    write_disposition='WRITE_TRUNCATE',
     dag=dag3
 )
 
