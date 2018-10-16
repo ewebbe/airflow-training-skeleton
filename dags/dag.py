@@ -3,7 +3,7 @@ import constants as c
 
 from airflow import DAG
 # from airflow.operators.python_operator import PythonOperator
-from airflow.utils.trigger_rule import TriggerRule
+# from airflow.utils.trigger_rule import TriggerRule
 from godatadriven.operators.postgres_to_gcs import PostgresToGoogleCloudStorageOperator
 from airflow.contrib.operators.dataproc_operator import (
     DataprocClusterCreateOperator,
