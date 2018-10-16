@@ -68,9 +68,9 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
 
 compute_aggregates = DataProcPySparkOperator(
     task_id='ComputeAllTheThings',
-    main='gs://gdd-training-bucket/build_statistics.py',
+    main='gs://gdd-trainings-bucket/build_statistics_simple.py',
     cluster_name='Guybrush',
-    arguments='',
+    arguments=["{{ ds }}"],
     dag=dag2
 )
 
