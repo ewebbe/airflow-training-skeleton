@@ -111,7 +111,7 @@ copy_to_bq = GoogleCloudStorageToBigQueryOperator(
 
 delete_from_bq = BigQueryOperator(
     task_id='delete_rows_from_bq',
-    bql="DELETE * FROM Analysis.average_prices WHERE trans_date = '{{ ds }}'",
+    bql="DELETE FROM Analysis.average_prices WHERE trans_date = '{{ ds }}'",
     dag=dag3
 )
 
