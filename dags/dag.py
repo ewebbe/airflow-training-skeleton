@@ -68,7 +68,9 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
 
 compute_aggregates = DataProcPySparkOperator(
     task_id='ComputeAllTheThings',
-    main='gs://gdd-trainings-bucket/build_statistics.py',
+    main='gs://europe-west1-training-airfl-9b3d38b2-bucket/other'
+         ''
+         '/build_statistics.py',
     cluster_name='analyse-pricing-{{ ds }}',
     arguments=["{{ ds }}"],
     dag=dag2
