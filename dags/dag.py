@@ -9,6 +9,7 @@ from airflow.contrib.operators.dataproc_operator import (
     DataprocClusterDeleteOperator,
     DataProcPySparkOperator
 )
+from airflow.contrib.operators.gsc_to_bq import GoogleCloudStorageToBigQueryOperator
 
 dag = DAG(
     dag_id="my_first_dag",
@@ -24,6 +25,19 @@ dag = DAG(
 
 dag2 = DAG(
     dag_id="my_second_dag",
+    schedule_interval="30 7 * * *",
+    default_args={
+        "owner": "ewebbe",
+        "start_date": dt.datetime(2018, 10, 1),
+        "depends_on_past": True,
+        "email_on_failure": True
+        # "email": "ewebbe@bol.com",
+    },
+)
+
+
+dag3 = DAG(
+    dag_id="my_third_dag",
     schedule_interval="30 7 * * *",
     default_args={
         "owner": "ewebbe",
@@ -82,6 +96,16 @@ dataproc_delete_cluster = DataprocClusterDeleteOperator(
     project_id=c.PROJECT_ID,
     trigger_rule=TriggerRule.ALL_DONE,
     dag=dag2
+)
+
+copy_to_bq = GoogleCloudStorageToBigQueryOperator(
+    task_id='CopyDataToBigQuery',
+    bucket='gs://airflow_training_data_123',
+    source_objects='/average_prices/*',
+    destination_project_dataset_table='Analysis.average_prices',
+    source_format=PARQUET,
+    write_disposition=WRITE_TRUNCATE,
+    dag=dag3
 )
 
 dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
