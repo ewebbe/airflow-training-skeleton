@@ -1,5 +1,5 @@
 import datetime as dt
-from dags import constants as c
+import constants as c
 from airflow import DAG
 # from airflow.operators.python_operator import PythonOperator
 # from airflow.utils.trigger_rule import TriggerRule
