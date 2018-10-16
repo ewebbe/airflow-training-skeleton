@@ -1,5 +1,5 @@
 import datetime as dt
-import constants as c
+from dags import constants as c
 from airflow import DAG
 # from airflow.operators.python_operator import PythonOperator
 # from airflow.utils.trigger_rule import TriggerRule
@@ -68,7 +68,7 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
 
 compute_aggregates = DataProcPySparkOperator(
     task_id='ComputeAllTheThings',
-    main='gs://gdd-trainings-bucket/build_statistics_simple.py',
+    main='gs://gdd-trainings-bucket/build_statistics.py',
     cluster_name='Guybrush',
     arguments=["{{ ds }}"],
     dag=dag2

@@ -9,7 +9,7 @@ print(dt)
 spark = SparkSession.builder.getOrCreate()
 
 spark.read.json(
-    "gs://airflow-training-data/land_registry_price_paid_uk/*/*.json"
+    "gs://airflow_training_data_123/PricePaid/*/*.json"
 ).withColumn(
     "transfer_date", col("transfer_date").cast("timestamp").cast("date")
 ).createOrReplaceTempView(
@@ -35,9 +35,9 @@ spark.read.json(
 #  |-- transaction: string (nullable = true)
 #  |-- transfer_date: double (nullable = true)
 
-spark.read.json("gs://airflow-training-data/currency/*.json").withColumn(
-    "date", col("date").cast("date")
-).createOrReplaceTempView("currencies")
+# spark.read.json("gs://airflow-training-data/currency/*.json").withColumn(
+#     "date", col("date").cast("date")
+# ).createOrReplaceTempView("currencies")
 
 # >>> df.printSchema()
 # root
@@ -54,18 +54,12 @@ aggregation = spark.sql(
         county,
         district,
         city,
-        `to` as currency,
-        AVG(price * conversion_rate) as price
+        AVG(price * 1) as price
     FROM
         land_registry_price_paid_uk
-    JOIN
-        currencies
-    ON
-        currencies.date = land_registry_price_paid_uk.transfer_date
     WHERE
         transfer_date = '{}'
     GROUP BY
-        currency,
         transfer_date,
         county,
         district,
@@ -73,8 +67,7 @@ aggregation = spark.sql(
     ORDER BY
         county,
         district,
-        city,
-        currency
+        city
 """.format(
         dt
     )
@@ -83,5 +76,5 @@ aggregation = spark.sql(
 (
     aggregation.write.mode("overwrite")
     .partitionBy("transfer_date")
-    .parquet("gs://airflow-training-data/average_prices/")
+    .parquet("gs://airflow_training_data_123/average_prices/")
 )
