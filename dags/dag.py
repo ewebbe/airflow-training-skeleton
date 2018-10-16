@@ -2,7 +2,7 @@ import datetime as dt
 
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
-# from godatadriven.operators.postgres_to_gcs import PostgresToGoogleCloudStorageOperator
+from godatadriven.operators.postgres_to_gcs import PostgresToGoogleCloudStorageOperator
 
 dag = DAG(
     dag_id="my_first_dag",
@@ -28,14 +28,14 @@ my_task = PythonOperator(
     dag=dag
 )
 
-# pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
-#     task_id="CollectDataFromPgrs"
-#     , postgres_conn_id=
-#     , sql= "SELECT * \
-#             FROM gdd.land_registry_price_paid_uk \
-#             WHERE transfer_date = '{{ ds }}'"
-#     , bucket = 'airflow_training_data_123'
-#     , filename = 'out.csv'
-#     , provide_context=True
-#     , dag=dag
-# )
+pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
+    task_id="CollectDataFromPgrs",
+    postgres_conn_id='Training_postgres',
+    sql="SELECT * \
+         FROM gdd.land_registry_price_paid_uk \
+         WHERE transfer_date = '{{ ds }}'",
+    bucket='airflow_training_data_123',
+    filename='out.csv',
+    provide_context=True,
+    dag=dag
+)
