@@ -55,7 +55,7 @@ aggregation = spark.sql(
         district,
         city,
         AVG(price * 1) as price,
-        CAST(CAST(transfer_date AS timestamp) AS date) trans_date,
+        CAST(CAST(transfer_date AS timestamp) AS date) trans_date
     FROM
         land_registry_price_paid_uk
     WHERE
