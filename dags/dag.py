@@ -3,6 +3,7 @@ import constants as c
 from airflow import DAG
 # from airflow.operators.python_operator import PythonOperator
 from airflow.utils.trigger_rule import TriggerRule
+from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 from godatadriven.operators.postgres_to_gcs import PostgresToGoogleCloudStorageOperator
 from airflow.contrib.operators.dataproc_operator import (
     DataprocClusterCreateOperator,
@@ -104,8 +105,17 @@ copy_to_bq = GoogleCloudStorageToBigQueryOperator(
     source_objects=['average_prices/{{ ds }}/*.parquet'],
     destination_project_dataset_table='Analysis.average_prices',
     source_format='PARQUET',
-    write_disposition='WRITE_TRUNCATE',
+    write_disposition='WRITE_APPEND',
+    dag=dag3
+)
+
+delete_from_bq = BigQueryOperator(
+    task_id='delete_rows_from_bq',
+    sql="DELETE * \
+         FROM Analysis.average_prices \
+         WHERE trans_date = '{{ ds }}'",
     dag=dag3
 )
 
 dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
+delete_from_bq >> copy_to_bq
