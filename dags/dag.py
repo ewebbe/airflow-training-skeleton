@@ -1,6 +1,10 @@
 import datetime as dt
 import constants as c
 from airflow import DAG
+from airflow.hooks.http_hook import HttpHook
+from airflow.models import BaseOperator
+from airflow.utils.decorators import apply_defaults
+from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
 # from airflow.operators.python_operator import PythonOperator
 from airflow.utils.trigger_rule import TriggerRule
 from airflow.contrib.operators.bigquery_operator import BigQueryOperator
@@ -11,6 +15,61 @@ from airflow.contrib.operators.dataproc_operator import (
     DataProcPySparkOperator
 )
 from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
+
+class HttpToGcsOperator(BaseOperator):
+    """
+    Calls an endpoint on an HTTP system to execute an action
+
+    :param http_conn_id: The connection to run the operator against
+    :type http_conn_id: string
+    :param endpoint: The relative part of the full url. (templated)
+    :type endpoint: string
+    :param gcs_path: The path of the GCS to store the result
+    :type gcs_path: string
+    """
+
+    template_fields = ('endpoint', 'data')
+    template_ext = ()
+    ui_color = '#f4a460'
+
+    @apply_defaults
+    def __init__(self,
+                 http_conn_id='default_http',
+                 endpoint=None,
+                 gcs_path=None,
+                 *args,
+                 **kwargs):
+        super(HttpToGcsOperator, self).__init__(*args, **kwargs)
+        self.http_conn_id=http_conn_id,
+        self.endpoint=endpoint,
+        self.gcs_path=gcs_path
+
+
+    def execute(self, context, url=None):
+        #connect to HTTP and get data
+        http = HttpHook(
+            method='GET',
+            http_conn_id='http_default'
+        )
+        res = http.run(url,
+                        data=None,
+                        headers=None,
+                        extra_options=None)
+
+        temp_file = open("testfile.txt", "w")
+        temp_file.write(res.text)
+        temp_file.close()
+
+        #store to GCS
+        store = GoogleCloudStorageHook(
+            google_cloud_storage_conn_id='google_cloud_default',
+            delegate_to=None
+        )
+        store.upload(bucket='airflow_training_data_123',
+                     object='Currencies/{{ds}}/out.json',
+                     filename='testfile.txt',
+                     mime_type='application/json')
+
 
 dag = DAG(
     dag_id="my_first_dag",
@@ -39,6 +98,18 @@ dag2 = DAG(
 
 dag3 = DAG(
     dag_id="my_third_dag",
+    schedule_interval="30 7 * * *",
+    default_args={
+        "owner": "ewebbe",
+        "start_date": dt.datetime(2018, 10, 1),
+        "depends_on_past": True,
+        "email_on_failure": True
+        # "email": "ewebbe@bol.com",
+    },
+)
+
+dag4 = DAG(
+    dag_id="my_fourth_dag",
     schedule_interval="30 7 * * *",
     default_args={
         "owner": "ewebbe",
@@ -116,5 +187,33 @@ delete_from_bq = BigQueryOperator(
     dag=dag3
 )
 
+collect_from_http = HttpToGcsOperator(
+    task_id='CollectFormHTTP',
+    conn_id='http_default',
+    url='"https://europe-west1-gdd-airflow-training.cloudfunctions.net/airflow-training-transform-valutas?date={{ ds }}&from=GBP&to=EUR"',
+    project_id=c.PROJECT_ID,
+    bucket='airflow_training_data_123',
+    filename='Currencies/{{ds}}/out.json',
+    dag=dag4
+)
+
+delete_from_bq_json = BigQueryOperator(
+    task_id='delete_rows_from_bqJSON',
+    bql="DELETE FROM Analysis.exchange_rates WHERE trans_date = '{{ ds }}'",
+    use_legacy_sql=False,
+    dag=dag4
+)
+
+copy_to_bq_json = GoogleCloudStorageToBigQueryOperator(
+    task_id='CopyDataToBigQueryJSON',
+    bucket='airflow_training_data_123',
+    source_objects=['Currencies/{{ ds }}/*.json'],
+    destination_project_dataset_table='Analysis.exchange_rates',
+    source_format='JSON',
+    write_disposition='WRITE_APPEND',
+    dag=dag4
+)
+
 dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
 delete_from_bq >> copy_to_bq
+collect_from_http >> delete_from_bq_json >> copy_to_bq_json
