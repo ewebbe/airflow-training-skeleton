@@ -109,17 +109,17 @@ dag3 = DAG(
     },
 )
 
-dag4 = DAG(
-    dag_id="my_fourth_dag",
-    schedule_interval="30 7 * * *",
-    default_args={
-        "owner": "ewebbe",
-        "start_date": dt.datetime(2018, 10, 1),
-        "depends_on_past": True,
-        "email_on_failure": True
-        # "email": "ewebbe@bol.com",
-    },
-)
+# dag4 = DAG(
+#     dag_id="my_fourth_dag",
+#     schedule_interval="30 7 * * *",
+#     default_args={
+#         "owner": "ewebbe",
+#         "start_date": dt.datetime(2018, 10, 1),
+#         "depends_on_past": True,
+#         "email_on_failure": True
+#         # "email": "ewebbe@bol.com",
+#     },
+# )
 
 dag5 = DAG(
     dag_id="my_fifth_dag",
