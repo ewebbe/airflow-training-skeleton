@@ -228,11 +228,11 @@ delete_from_bq = BigQueryOperator(
 
 load_into_bigquery = DataFlowPythonOperator(
     task_id='Dataflow_into_bigquery',
-    dataflow_default_options={"input": "gs://airflow_training_data_123/PricePaid/{{ ds }}/*.json",
+    dataflow_default_options={"input": "gs://airflow_training_data_123/PricePaid/*/*.json",
                               "table": "Dataflow_import",
                               "dataset": "Analysis",
                               "project": c.PROJECT_ID,
-                              "bucket": "gs://airflow_training_data_123",
+                              "bucket": "europe-west1-training-airfl-22519ec9-bucket",
                               "name": "write-to-bq-{{ ds }}"},
     py_file="gs://europe-west1-training-airfl-9b3d38b2-bucket/other/dataflow_job.py",
     project_id=c.PROJECT_ID,

@@ -23,7 +23,7 @@ def run(argv=None):
     pipeline_args.extend(
         [
             "--runner=DataflowRunner",
-            "--project=gdd-airflow-training",
+            "--project=airflowbolcom-ec9e6287ae0dcca0",
             "--staging_location=gs://airflow-training-data/dataflow-staging",
             "--temp_location=gs://airflow-training-data/dataflow-temp",
             "--job_name=gcs-gzcomp-to-bq1",
