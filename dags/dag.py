@@ -66,6 +66,7 @@ class HttpToGcsOperator(BaseOperator):
                      filename='testfile.txt',
                      mime_type='application/json')
 
+
 dag = DAG(
     dag_id="my_first_dag",
     schedule_interval="30 7 * * *",
