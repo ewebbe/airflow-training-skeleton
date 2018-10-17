@@ -21,6 +21,9 @@ from airflow.contrib.operators.dataflow_operator import DataFlowPythonOperator
 
 from airflow.operators.python_operator import BranchPythonOperator
 from airflow.operators.dummy_operator import DummyOperator
+
+from airflow.contrib.operators.kubernetes_pod_operator import KubernetesPodOperator
+
 # import random
 
 # class HttpToGcsOperator(BaseOperator):
@@ -151,6 +154,17 @@ dag6 = DAG(
     },
 )
 
+dag7 = DAG(
+    dag_id="my_Kubernetes_dag",
+    schedule_interval="30 7 * * *",
+    default_args={
+        "owner": "ewebbe",
+        "start_date": airflow.utils.dates.days_ago(2),
+        "depends_on_past": True,
+        "email_on_failure": True
+        # "email": "ewebbe@bol.com",
+    },
+)
 
 def print_exec_date(**context):
     print(context["execution_date"])
@@ -271,10 +285,6 @@ options = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', '
 today = dt.datetime.now().strftime("%A")
 
 
-# def get_dayname():
-#     dt.datetime.now().strftime("%A")
-
-
 branching = BranchPythonOperator(
     task_id='branch',
     python_callable=print_exec_dayname,
@@ -290,3 +300,11 @@ join = DummyOperator(
 
 for option in options:
     branching >> DummyOperator(task_id=option, dag=dag6) >> join
+
+kubernetes_min_pod = KubernetesPodOperator(
+    task_id='RunContainer',
+    name='RunAContainer',
+    namespace='default',
+    image='hello-world',
+    dag=dag7
+)
