@@ -1,5 +1,6 @@
 import datetime as dt
 import constants as c
+import airflow
 from airflow import DAG
 # from airflow.hooks.http_hook import HttpHook
 # from airflow.models import BaseOperator
