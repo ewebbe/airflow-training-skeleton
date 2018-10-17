@@ -18,6 +18,10 @@ from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOper
 
 from airflow.contrib.operators.dataflow_operator import DataFlowPythonOperator
 
+from airflow.operators.python_operator import BranchPythonOperator
+from airflow.operators.dummy_operator import DummyOperator
+import random
+
 # class HttpToGcsOperator(BaseOperator):
 #     """
 #     Calls an endpoint on an HTTP system to execute an action
@@ -133,6 +137,19 @@ dag5 = DAG(
     },
 )
 
+
+dag6 = DAG(
+    dag_id="my_branching_dag",
+    schedule_interval="30 7 * * *",
+    default_args={
+        "owner": "ewebbe",
+        "start_date": airflow.utils.dates.days_ago(2)
+        "depends_on_past": True,
+        "email_on_failure": True
+        # "email": "ewebbe@bol.com",
+    },
+)
+
 def print_exec_date(**context):
     print(context["execution_date"])
 
@@ -234,7 +251,7 @@ load_into_bigquery = DataFlowPythonOperator(
                               "project": c.PROJECT_ID,
                               "bucket": "europe-west1-training-airfl-22519ec9-bucket",
                               "name": "write-to-bq-{{ ds }}"},
-    py_file="gs://europe-west1-training-airfl-9b3d38b2-bucket/other/dataflow_job.py",
+    py_file="gs://airflow_training_data/other/dataflow_job.py",
     project_id=c.PROJECT_ID,
     dag=dag5
 )
@@ -242,3 +259,23 @@ load_into_bigquery = DataFlowPythonOperator(
 dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
 delete_from_bq >> copy_to_bq
 # collect_from_http >> delete_from_bq_json >> copy_to_bq_json
+
+
+options = ['Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun']
+today = dt.datetime.now().strftime("%A")
+
+
+branching = BranchPythonOperator(
+    task_id='branch',
+    python_callable=lambda: random.choice(options),
+    dag=dag6
+)
+
+join = DummyOperator(
+    task_id='join',
+    trigger_rule=TriggerRule.ONE_SUCCESS,
+    dag=dag6
+)
+
+for option in options:
+    branching >> DummyOperator(task_id=option, dag=dag6) >> join
