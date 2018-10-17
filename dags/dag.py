@@ -151,6 +151,7 @@ dag6 = DAG(
     },
 )
 
+
 def print_exec_date(**context):
     print(context["execution_date"])
 
@@ -270,13 +271,13 @@ options = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', '
 today = dt.datetime.now().strftime("%A")
 
 
-def get_dayname():
-    dt.datetime.now().strftime("%A")
+# def get_dayname():
+#     dt.datetime.now().strftime("%A")
 
 
 branching = BranchPythonOperator(
     task_id='branch',
-    python_callable=get_dayname,
+    python_callable=print_exec_dayname,
     provide_context=True,
     dag=dag6
 )
