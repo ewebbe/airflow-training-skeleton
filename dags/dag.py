@@ -42,8 +42,7 @@ class HttpToGcsOperator(BaseOperator):
                  gcs_path=None,
                  method="GET",
                  *args,
-                 **kwargs
-    ):
+                 **kwargs):
         super(HttpToGcsOperator, self).__init__(*args, **kwargs)
         self.http_conn_id = http_conn_id,
         self.endpoint = endpoint,
