@@ -266,9 +266,13 @@ options = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', '
 today = dt.datetime.now().strftime("%A")
 
 
+def get_dayname():
+    dt.datetime.now().strftime("%A")
+
+
 branching = BranchPythonOperator(
     task_id='branch',
-    python_callable=lambda: dt.datetime.now().strftime("%A"),
+    python_callable=get_dayname,
     dag=dag6
 )
 
