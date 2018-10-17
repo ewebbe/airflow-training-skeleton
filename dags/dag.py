@@ -21,7 +21,7 @@ from airflow.contrib.operators.dataflow_operator import DataFlowPythonOperator
 
 from airflow.operators.python_operator import BranchPythonOperator
 from airflow.operators.dummy_operator import DummyOperator
-import random
+# import random
 
 # class HttpToGcsOperator(BaseOperator):
 #     """
