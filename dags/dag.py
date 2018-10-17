@@ -155,6 +155,9 @@ def print_exec_date(**context):
     print(context["execution_date"])
 
 
+def print_exec_dayname(**context):
+    return context["execution_date"].strftime("%A")
+
 # my_task = PythonOperator(
 #     task_id="task_name",
 #     python_callable=print_exec_date,
