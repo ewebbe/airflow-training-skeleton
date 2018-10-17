@@ -46,7 +46,7 @@ class HttpToGcsOperator(BaseOperator):
 
 
     def execute(self, context, url=None):
-        #connect to HTTP and get data
+        # connect to HTTP and get data
         http = HttpHook(
             method='GET',
             http_conn_id='http_default'
@@ -60,7 +60,7 @@ class HttpToGcsOperator(BaseOperator):
         temp_file.write(res.text)
         temp_file.close()
 
-        #store to GCS
+        # store to GCS
         store = GoogleCloudStorageHook(
             google_cloud_storage_conn_id='google_cloud_default',
             delegate_to=None
