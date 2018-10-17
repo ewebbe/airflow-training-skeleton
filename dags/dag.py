@@ -262,13 +262,13 @@ delete_from_bq >> copy_to_bq
 # collect_from_http >> delete_from_bq_json >> copy_to_bq_json
 
 
-options = ['Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun']
+options = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 today = dt.datetime.now().strftime("%A")
 
 
 branching = BranchPythonOperator(
     task_id='branch',
-    python_callable=lambda: random.choice(options),
+    python_callable=today,
     dag=dag6
 )
 
