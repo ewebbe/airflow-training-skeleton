@@ -16,6 +16,8 @@ from airflow.contrib.operators.dataproc_operator import (
 )
 from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
 
+from airflow.contrib.operators.dataflow_operator import DataFlowPythonOperator
+
 class HttpToGcsOperator(BaseOperator):
     """
     Calls an endpoint on an HTTP system to execute an action
@@ -28,21 +30,26 @@ class HttpToGcsOperator(BaseOperator):
     :type gcs_path: string
     """
 
-    template_fields = ('endpoint', 'data')
+    template_fields = ('endpoint', 'gcs_path', 'data')
     template_ext = ()
     ui_color = '#f4a460'
 
     @apply_defaults
     def __init__(self,
+                 endpoint,
                  http_conn_id='default_http',
-                 endpoint=None,
+                 gcs_conn_id="gcs_default",
                  gcs_path=None,
+                 method="GET",
                  *args,
-                 **kwargs):
+                 **kwargs
+    ):
         super(HttpToGcsOperator, self).__init__(*args, **kwargs)
         self.http_conn_id = http_conn_id,
         self.endpoint = endpoint,
-        self.gcs_path = gcs_path
+        self.method = method,
+        self.gcs_path = gcs_path,
+        self.gcs_conn_id = gcs_conn_id
 
     def execute(self, context, url=None):
         # connect to HTTP and get data
@@ -106,6 +113,18 @@ dag3 = DAG(
 
 dag4 = DAG(
     dag_id="my_fourth_dag",
+    schedule_interval="30 7 * * *",
+    default_args={
+        "owner": "ewebbe",
+        "start_date": dt.datetime(2018, 10, 1),
+        "depends_on_past": True,
+        "email_on_failure": True
+        # "email": "ewebbe@bol.com",
+    },
+)
+
+dag5 = DAG(
+    dag_id="my_fifth_dag",
     schedule_interval="30 7 * * *",
     default_args={
         "owner": "ewebbe",
@@ -209,6 +228,13 @@ copy_to_bq_json = GoogleCloudStorageToBigQueryOperator(
     source_format='JSON',
     write_disposition='WRITE_APPEND',
     dag=dag4
+)
+
+load_into_bigquery = DataFlowPythonOperator(
+    task_id='Dataflow_into_bigquery',
+    dataflow_default_options={input="gs://airflow_training_data_123/PricePaid/2018-08-01/*.json"},
+    py_file="gs://airflow_training_data/dataflow_job.py",
+    dag=dag5
 )
 
 dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
