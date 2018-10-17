@@ -277,6 +277,7 @@ def get_dayname():
 branching = BranchPythonOperator(
     task_id='branch',
     python_callable=get_dayname,
+    provide_context=True,
     dag=dag6
 )
 
