@@ -167,9 +167,7 @@ dataproc_create_cluster = DataprocClusterCreateOperator(
 
 compute_aggregates = DataProcPySparkOperator(
     task_id='ComputeAllTheThings',
-    main='gs://europe-west1-training-airfl-9b3d38b2-bucket/other'
-         ''
-         '/build_statistics.py',
+    main='gs://europe-west1-training-airfl-9b3d38b2-bucket/other/build_statistics.py',
     cluster_name='analyse-pricing-{{ ds }}',
     arguments=["{{ ds }}"],
     dag=dag2
@@ -230,8 +228,14 @@ delete_from_bq = BigQueryOperator(
 
 load_into_bigquery = DataFlowPythonOperator(
     task_id='Dataflow_into_bigquery',
-    dataflow_default_options={"input": "gs://airflow_training_data_123/PricePaid/{{ ds }}/*.json"},
+    dataflow_default_options={"input": "gs://airflow_training_data_123/PricePaid/{{ ds }}/*.json",
+                              "table": "Dataflow_import",
+                              "dataset": "Analysis",
+                              "project": c.PROJECT_ID,
+                              "bucket": "gs://airflow_training_data_123",
+                              "name": "write-to-bq-{{ ds }}"},
     py_file="gs://europe-west1-training-airfl-9b3d38b2-bucket/other/dataflow_job.py",
+    project_id=c.PROJECT_ID,
     dag=dag5
 )
 
