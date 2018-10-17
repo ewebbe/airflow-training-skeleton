@@ -144,7 +144,7 @@ dag6 = DAG(
     schedule_interval="30 7 * * *",
     default_args={
         "owner": "ewebbe",
-        "start_date": airflow.utils.dates.days_ago(2)
+        "start_date": airflow.utils.dates.days_ago(2),
         "depends_on_past": True,
         "email_on_failure": True
         # "email": "ewebbe@bol.com",
