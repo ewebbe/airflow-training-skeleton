@@ -1,10 +1,10 @@
 import datetime as dt
 import constants as c
 from airflow import DAG
-from airflow.hooks.http_hook import HttpHook
-from airflow.models import BaseOperator
-from airflow.utils.decorators import apply_defaults
-from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
+# from airflow.hooks.http_hook import HttpHook
+# from airflow.models import BaseOperator
+# from airflow.utils.decorators import apply_defaults
+# from airflow.contrib.hooks.gcs_hook import GoogleCloudStorageHook
 # from airflow.operators.python_operator import PythonOperator
 from airflow.utils.trigger_rule import TriggerRule
 from airflow.contrib.operators.bigquery_operator import BigQueryOperator
