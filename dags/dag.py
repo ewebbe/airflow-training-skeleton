@@ -230,7 +230,7 @@ delete_from_bq = BigQueryOperator(
 
 load_into_bigquery = DataFlowPythonOperator(
     task_id='Dataflow_into_bigquery',
-    dataflow_default_options={"input": "gs://airflow_training_data_123/PricePaid/2018-08-01/*.json"},
+    dataflow_default_options={"input": "gs://airflow_training_data_123/PricePaid/{{ ds }}/*.json"},
     py_file="gs://airflow_training_data/dataflow_job.py",
     dag=dag5
 )
