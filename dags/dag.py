@@ -201,33 +201,33 @@ delete_from_bq = BigQueryOperator(
     dag=dag3
 )
 
-collect_from_http = HttpToGcsOperator(
-    task_id='CollectFormHTTP',
-    conn_id='http_default',
-    url='"https://europe-west1-gdd-airflow-training.cloudfunctions.net/\
-          airflow-training-transform-valutas?date={{ ds }}&from=GBP&to=EUR"',
-    project_id=c.PROJECT_ID,
-    bucket='airflow_training_data_123',
-    filename='Currencies/{{ds}}/out.json',
-    dag=dag4
-)
-
-delete_from_bq_json = BigQueryOperator(
-    task_id='delete_rows_from_bqJSON',
-    bql="DELETE FROM Analysis.exchange_rates WHERE trans_date = '{{ ds }}'",
-    use_legacy_sql=False,
-    dag=dag4
-)
-
-copy_to_bq_json = GoogleCloudStorageToBigQueryOperator(
-    task_id='CopyDataToBigQueryJSON',
-    bucket='airflow_training_data_123',
-    source_objects=['Currencies/{{ ds }}/*.json'],
-    destination_project_dataset_table='Analysis.exchange_rates',
-    source_format='JSON',
-    write_disposition='WRITE_APPEND',
-    dag=dag4
-)
+# collect_from_http = HttpToGcsOperator(
+#     task_id='CollectFormHTTP',
+#     conn_id='http_default',
+#     url='"https://europe-west1-gdd-airflow-training.cloudfunctions.net/\
+#           airflow-training-transform-valutas?date={{ ds }}&from=GBP&to=EUR"',
+#     project_id=c.PROJECT_ID,
+#     bucket='airflow_training_data_123',
+#     filename='Currencies/{{ds}}/out.json',
+#     dag=dag4
+# )
+#
+# delete_from_bq_json = BigQueryOperator(
+#     task_id='delete_rows_from_bqJSON',
+#     bql="DELETE FROM Analysis.exchange_rates WHERE trans_date = '{{ ds }}'",
+#     use_legacy_sql=False,
+#     dag=dag4
+# )
+#
+# copy_to_bq_json = GoogleCloudStorageToBigQueryOperator(
+#     task_id='CopyDataToBigQueryJSON',
+#     bucket='airflow_training_data_123',
+#     source_objects=['Currencies/{{ ds }}/*.json'],
+#     destination_project_dataset_table='Analysis.exchange_rates',
+#     source_format='JSON',
+#     write_disposition='WRITE_APPEND',
+#     dag=dag4
+# )
 
 load_into_bigquery = DataFlowPythonOperator(
     task_id='Dataflow_into_bigquery',
@@ -238,4 +238,4 @@ load_into_bigquery = DataFlowPythonOperator(
 
 dataproc_create_cluster >> compute_aggregates >> dataproc_delete_cluster
 delete_from_bq >> copy_to_bq
-collect_from_http >> delete_from_bq_json >> copy_to_bq_json
+# collect_from_http >> delete_from_bq_json >> copy_to_bq_json
