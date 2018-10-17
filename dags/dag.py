@@ -190,7 +190,8 @@ delete_from_bq = BigQueryOperator(
 collect_from_http = HttpToGcsOperator(
     task_id='CollectFormHTTP',
     conn_id='http_default',
-    url='"https://europe-west1-gdd-airflow-training.cloudfunctions.net/airflow-training-transform-valutas?date={{ ds }}&from=GBP&to=EUR"',
+    url='"https://europe-west1-gdd-airflow-training.cloudfunctions.net/\
+          airflow-training-transform-valutas?date={{ ds }}&from=GBP&to=EUR"',
     project_id=c.PROJECT_ID,
     bucket='airflow_training_data_123',
     filename='Currencies/{{ds}}/out.json',
