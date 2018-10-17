@@ -303,7 +303,7 @@ for option in options:
 
 kubernetes_min_pod = KubernetesPodOperator(
     task_id='RunContainer',
-    name='RunAContainer',
+    name='RunContainer',
     namespace='default',
     image='hello-world',
     dag=dag7
