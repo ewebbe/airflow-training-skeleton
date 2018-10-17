@@ -165,6 +165,7 @@ def print_exec_dayname(**context):
 #     dag=dag
 # )
 
+
 pgsl_to_gcs = PostgresToGoogleCloudStorageOperator(
     task_id="CollectDataFromPgrs",
     postgres_conn_id='Training_postgres',
