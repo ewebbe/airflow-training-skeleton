@@ -40,10 +40,9 @@ class HttpToGcsOperator(BaseOperator):
                  *args,
                  **kwargs):
         super(HttpToGcsOperator, self).__init__(*args, **kwargs)
-        self.http_conn_id=http_conn_id,
-        self.endpoint=endpoint,
-        self.gcs_path=gcs_path
-
+        self.http_conn_id = http_conn_id,
+        self.endpoint = endpoint,
+        self.gcs_path = gcs_path
 
     def execute(self, context, url=None):
         # connect to HTTP and get data
@@ -51,10 +50,7 @@ class HttpToGcsOperator(BaseOperator):
             method='GET',
             http_conn_id='http_default'
         )
-        res = http.run(url,
-                        data=None,
-                        headers=None,
-                        extra_options=None)
+        res = http.run(url, data=None, headers=None, extra_options=None)
 
         temp_file = open("testfile.txt", "w")
         temp_file.write(res.text)
@@ -69,7 +65,6 @@ class HttpToGcsOperator(BaseOperator):
                      object='Currencies/{{ds}}/out.json',
                      filename='testfile.txt',
                      mime_type='application/json')
-
 
 dag = DAG(
     dag_id="my_first_dag",
