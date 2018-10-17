@@ -18,60 +18,59 @@ from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOper
 
 from airflow.contrib.operators.dataflow_operator import DataFlowPythonOperator
 
-class HttpToGcsOperator(BaseOperator):
-    """
-    Calls an endpoint on an HTTP system to execute an action
-
-    :param http_conn_id: The connection to run the operator against
-    :type http_conn_id: string
-    :param endpoint: The relative part of the full url. (templated)
-    :type endpoint: string
-    :param gcs_path: The path of the GCS to store the result
-    :type gcs_path: string
-    """
-
-    template_fields = ('endpoint', 'gcs_path', 'data')
-    template_ext = ()
-    ui_color = '#f4a460'
-
-    @apply_defaults
-    def __init__(self,
-                 endpoint,
-                 http_conn_id='default_http',
-                 gcs_conn_id="gcs_default",
-                 gcs_path=None,
-                 method="GET",
-                 *args,
-                 **kwargs):
-        super(HttpToGcsOperator, self).__init__(*args, **kwargs)
-        self.http_conn_id = http_conn_id,
-        self.endpoint = endpoint,
-        self.method = method,
-        self.gcs_path = gcs_path,
-        self.gcs_conn_id = gcs_conn_id
-
-    def execute(self, context, url=None):
-        # connect to HTTP and get data
-        http = HttpHook(
-            method='GET',
-            http_conn_id='http_default'
-        )
-        res = http.run(url, data=None, headers=None, extra_options=None)
-
-        temp_file = open("testfile.txt", "w")
-        temp_file.write(res.text)
-        temp_file.close()
-
-        # store to GCS
-        store = GoogleCloudStorageHook(
-            google_cloud_storage_conn_id='google_cloud_default',
-            delegate_to=None
-        )
-        store.upload(bucket='airflow_training_data_123',
-                     object='Currencies/{{ds}}/out.json',
-                     filename='testfile.txt',
-                     mime_type='application/json')
-
+# class HttpToGcsOperator(BaseOperator):
+#     """
+#     Calls an endpoint on an HTTP system to execute an action
+#
+#     :param http_conn_id: The connection to run the operator against
+#     :type http_conn_id: string
+#     :param endpoint: The relative part of the full url. (templated)
+#     :type endpoint: string
+#     :param gcs_path: The path of the GCS to store the result
+#     :type gcs_path: string
+#     """
+#
+#     template_fields = ('endpoint', 'gcs_path', 'data')
+#     template_ext = ()
+#     ui_color = '#f4a460'
+#
+#     @apply_defaults
+#     def __init__(self,
+#                  endpoint,
+#                  http_conn_id='default_http',
+#                  gcs_conn_id="gcs_default",
+#                  gcs_path=None,
+#                  method="GET",
+#                  *args,
+#                  **kwargs):
+#         super(HttpToGcsOperator, self).__init__(*args, **kwargs)
+#         self.http_conn_id = http_conn_id,
+#         self.endpoint = endpoint,
+#         self.method = method,
+#         self.gcs_path = gcs_path,
+#         self.gcs_conn_id = gcs_conn_id
+#
+#     def execute(self, context, url=None):
+#         # connect to HTTP and get data
+#         http = HttpHook(
+#             method='GET',
+#             http_conn_id='http_default'
+#         )
+#         res = http.run(url, data=None, headers=None, extra_options=None)
+#
+#         temp_file = open("testfile.txt", "w")
+#         temp_file.write(res.text)
+#         temp_file.close()
+#
+#         # store to GCS
+#         store = GoogleCloudStorageHook(
+#             google_cloud_storage_conn_id='google_cloud_default',
+#             delegate_to=None
+#         )
+#         store.upload(bucket='airflow_training_data_123',
+#                      object='Currencies/{{ds}}/out.json',
+#                      filename='testfile.txt',
+#                      mime_type='application/json')
 
 dag = DAG(
     dag_id="my_first_dag",
